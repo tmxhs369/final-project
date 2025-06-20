@@ -4,6 +4,15 @@
 
 ---
 
+
+✅ 사전 준비
+먼저 필요한 라이브러리를 설치해야 합니다:
+
+bash
+복사
+편집
+pip install transformers datasets evaluate rouge-score
+
 ## 📁 1. `config.py`
 
 ```python
