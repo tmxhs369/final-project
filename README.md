@@ -23,7 +23,7 @@ Transformer 기반 아키텍처(BART, T5 등)를 활용하여 텍스트 요약 �
 
 ##  사전 준비
 
-먼저 필요한 라이브러리를 설치해야 한다.:
+먼저 필요한 라이브러리를 설치해야 한다.
 
 ```bash
 pip install transformers datasets evaluate rouge-score
