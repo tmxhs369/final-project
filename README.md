@@ -151,7 +151,7 @@ print("ROUGE 결과:", compute_metrics(test_results))
 
 ---
 
-##  4. 요약 결과 확인 (테스트)
+##  4. 요약 결과 확인
 
 ```python
 article = dataset["test"][0]["article"]
@@ -172,7 +172,7 @@ print("\n 참조 요약:\n", ref)
 
 ---
 
-##  5. (선택) 추출적 요약
+##  5. 추출적 요약
 
 ```python
 from sumy.summarizers.lsa import LsaSummarizer
