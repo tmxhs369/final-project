@@ -1,0 +1,9 @@
+# config.py
+MODEL_NAME = "facebook/bart-base"
+DATASET_NAME = "cnn_dailymail"
+DATASET_CONFIG = "3.0.0"
+MAX_INPUT_LENGTH = 1024
+MAX_TARGET_LENGTH = 128
+BATCH_SIZE = 4
+NUM_EPOCHS = 3
+LEARNING_RATE = 5e-5
