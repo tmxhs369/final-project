@@ -1,5 +1,24 @@
 # final-project
 
+---
+
+###  **목표 (Objective):**
+
+Transformer 기반 아키텍처(BART, T5 등)를 활용하여 텍스트 요약 모델을 개발한다.
+
+---
+
+###  **접근 방식 (Approach):**
+
+1. **CNN/Daily Mail 또는 XSum과 같은 데이터셋**을 사용하여 모델을 학습한다.
+2. 텍스트 데이터를 전처리한다 (예: 토크나이징, 소문자 변환 등).
+3. Transformer 기반 모델을 해당 데이터셋에 대해 **파인튜닝(fine-tuning)** 한다.
+4. **추출적 요약**과 **추상적 요약** 기법을 모두 구현한다.
+5. \*\*ROUGE 점수 및 사람 평가(human evaluation)\*\*를 통해 요약 결과를 평가한다.
+
+---
+
+
 아래는 Transformer 기반 텍스트 요약 모델(예: BART 또는 T5)을 CNN/DailyMail 또는 XSum 데이터셋을 사용하여 fine-tuning 하고, 추출적 및 추상적 요약 기법을 구현한 파이썬 코드 템플릿이다.
 
 ##  사전 준비
