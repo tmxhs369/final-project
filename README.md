@@ -44,6 +44,7 @@ MIDI 파일 데이터셋을 기반으로 새로운 음악을 생성하는 딥러
 ---
 
 ##  1. `config.py`
+```
 # config.py
 
 from dataclasses import dataclass
