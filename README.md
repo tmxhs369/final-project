@@ -4,6 +4,7 @@ MIDI 기반 음악 생성 모델 (LSTM)
 
 ###  **목표**
 MIDI 파일 데이터셋을 기반으로 새로운 음악을 생성하는 딥러닝 모델을 설계하고 구현한다.
+
 이를 위해 시퀀스 데이터 처리에 적합한 LSTM(Long Short-Term Memory) 모델을 활용하여,
 이전 음표 시퀀스를 바탕으로 다음 음표를 예측하고 이를 반복적으로 생성함으로써 새로운 음악을 만들어내는 모델을 구현한다.
 
@@ -17,9 +18,9 @@ MIDI 파일 데이터셋을 기반으로 새로운 음악을 생성하는 딥러
 2. 데이터 전처리
  - pretty_midi 라이브러리를 활용하여 MIDI 파일을 파싱한다.
  - 음악을 다음과 같은 이벤트 기반 토큰 시퀀스로 변환한다.
- - NOTE_ON_{pitch}: 특정 음표의 시작
- - NOTE_OFF_{pitch}: 특정 음표의 종료
- - TIME_SHIFT_{n}: 일정 시간 간격 이동
+  - NOTE_ON_{pitch}: 특정 음표의 시작
+  - NOTE_OFF_{pitch}: 특정 음표의 종료
+  - TIME_SHIFT_{n}: 일정 시간 간격 이동
  - 이를 통해 음악을 자연어 처리 문제와 유사한 시퀀스 예측 문제로 변환한다.
 3. 모델 설계
  - Embedding Layer + LSTM + Fully Connected Layer 구조의 Sequence Language Model을 구성한다.
@@ -34,11 +35,11 @@ MIDI 파일 데이터셋을 기반으로 새로운 음악을 생성하는 딥러
  - 생성된 토큰 시퀀스를 다시 MIDI 파일로 변환한다.
 6. 평가 방법
  - 정량적 평가
- - Pitch Class Entropy (음높이 다양성)
- - Note Density (초당 음표 수)
- - N-gram 반복률 (패턴 반복 정도)
+  - Pitch Class Entropy (음높이 다양성)
+  - Note Density (초당 음표 수)
+  - N-gram 반복률 (패턴 반복 정도)
  - 정성적 평가
- - 사람이 직접 청취하여 음악적 자연스러움, 일관성, 장르 적합성 평가
+  - 사람이 직접 청취하여 음악적 자연스러움, 일관성, 장르 적합성 평가
 
 ---
 
