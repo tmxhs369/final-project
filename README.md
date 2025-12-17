@@ -557,7 +557,7 @@ if __name__ == "__main__":
 
 1. 역할
 - LSTM 기반 시퀀스 모델을 학습하는 메인 학습 스크립트
-2. 모델 구
+2. 모델 구조
 - Embedding Layer
 - Multi-layer LSTM
 - Fully Connected Layer
@@ -705,69 +705,32 @@ if __name__ == "__main__":
 
 
 
-###  설명
+### 결론 및 향후 연구
 
-1. **데이터 로드**: Hugging Face `datasets` 라이브러리를 사용해 CNN/DailyMail 데이터셋을 불러온다.
-2. **전처리**: 기사와 요약을 BART 모델 입력 형식에 맞게 토크나이징
-3. **모델 로드**: BART 모델을 로드하여 fine-tuning을 준비한다.
-4. **학습 인자 설정**: 학습에 필요한 설정(배치 사이즈, 학습률, 평가 전략 등)을 정의
-5. **평가지표 설정**: ROUGE 점수 계산을 위한 함수를 정의
-6. **Trainer 구성**: Hugging Face의 `Trainer` 클래스를 활용해 학습을 구성
-7. **모델 학습**: fine-tuning 시작.
-8. **테스트셋 평가**: 학습이 끝난 모델을 테스트셋에 적용해 성능을 평가한다.
+본 프로젝트에서는 MIDI 파일을 이벤트 기반 토큰 시퀀스로 변환한 후, LSTM 모델을 활용하여 새로운 음악을 생성하는 시스템을 성공적으로 구현하였다.
+이를 통해 음악 생성 문제가 자연어 처리에서의 언어 모델링 문제와 유사한 구조로 다룰 수 있음을 확인하였다.
 
----
+실험 결과, 모델은 학습 데이터의 전반적인 음역대와 리듬 패턴을 어느 정도 학습하여
+일관성 있는 음악 구조를 가진 MIDI 파일을 생성할 수 있었으며,
+Temperature 및 Top-k 값 조절을 통해 생성 결과의 다양성과 안정성 사이의 trade-off를 관찰할 수 있었다.
 
-##  4. 요약 결과 확인
+다만 다음과 같은 한계점도 확인되었다.
+- 긴 곡을 생성할수록 구조적 반복이나 비자연스러운 전이가 발생하는 경향
+- 화성(chord) 구조나 장기적인 음악적 전개를 명시적으로 학습하지 못함
+- 단일 LSTM 기반 모델의 표현력 한계
 
-```python
-article = dataset["test"][0]["article"]
-ref = dataset["test"][0]["highlights"]
+이를 바탕으로 향후 연구 방향으로는 다음과 같은 개선이 가능하다.
 
-input_ids = tokenizer(article, return_tensors="pt", truncation=True).input_ids
-summary_ids = model.generate(input_ids, max_length=MAX_TARGET_LENGTH)
-summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+1. Transformer 기반 모델 적용
+- LSTM 대신 Transformer를 사용하여 장기 의존성 문제 개선
+2. 고급 토큰 표현
+- 코드(chord), 박자(beat), 마디(bar) 단위 토큰 도입
+3. 조건부 음악 생성
+- 장르, 템포, 키(key) 등의 조건을 입력으로 받는 Conditional Generation
+4. 평가 지표 고도화
+- 음악 이론 기반 지표 또는 사용자 설문 기반 평가 도입
 
-print(" 원문:\n", article[:500])
-print("\n 모델 요약:\n", summary)
-print("\n 참조 요약:\n", ref)
-```
-
-###  설명
-
-* 학습된 모델을 사용해 하나의 기사에 대해 요약을 생성하고, 사람이 직접 비교할 수 있도록 참조 요약과 함께 출력
-
----
-
-##  5. 추출적 요약
-
-```python
-from sumy.summarizers.lsa import LsaSummarizer
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-
-def extractive_summary(text, num_sentences=3):
-    parser = PlaintextParser.from_string(text, Tokenizer("english"))
-    summarizer = LsaSummarizer()
-    summary = summarizer(parser.document, num_sentences)
-    return " ".join(str(sentence) for sentence in summary)
-```
-
-###  설명
-
-* Sumy의 LSA 방식으로 간단한 **추출적 요약**을 구현한다.
-* 이는 문장에서 중요한 문장을 선택해 요약을 만드는 방식입니다. 별도의 학습 없이 사용 가능하다.
-
----
-
-##  전체 요약
-
-| 단계           | 설명                                  |
-| ------------ | ----------------------------------- |
-| 1. 설정 파일 작성  | 모델, 데이터셋, 하이퍼파라미터 설정                |
-| 2. 전처리 함수 구현 | 기사와 요약을 모델 입력에 맞게 변환                |
-| 3. 메인 코드 실행  | 데이터 로드 → 모델 준비 → 학습 → 평가까지 전체 파이프라인 |
-| 4. 결과 확인     | 실제 기사에 대해 생성된 요약을 수동으로 비교           |
-| 5. 추가 기법     | Sumy 등으로 추출적 요약도 테스트 가능             |
+본 프로젝트는 기계학습을 활용한 음악 생성의 기본 파이프라인을 이해하고 직접 구현했다는 점에서 의의가 있으며,
+딥러닝 기반 생성 모델이 예술 영역에 어떻게 응용될 수 있는지를 실험적으로 확인한 사례라 할 수 있다.
 
 ---
