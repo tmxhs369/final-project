@@ -43,18 +43,6 @@ MIDI 파일 데이터셋을 기반으로 새로운 음악을 생성하는 딥러
 
 ---
 
-
-아래는 Transformer 기반 텍스트 요약 모델(예: BART 또는 T5)을 CNN/DailyMail 또는 XSum 데이터셋을 사용하여 fine-tuning 하고, 추출적 및 추상적 요약 기법을 구현한 파이썬 코드 템플릿이다.
-
-##  사전 준비
-
-먼저 필요한 라이브러리를 설치해야 한다.
-
-```bash
-pip install transformers datasets evaluate rouge-score
-```
-
----
 ##  1. `config.py`
 
 ```python
