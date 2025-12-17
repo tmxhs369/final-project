@@ -328,63 +328,77 @@ def load_json(path: str):
 
 ---
 
-##  3. `main.py`
+##  3. `preprocess.py`
 
 ```python
-# main.py
-from datasets import load_dataset
-from transformers import (AutoTokenizer, AutoModelForSeq2SeqLM,
-                          Seq2SeqTrainer, Seq2SeqTrainingArguments, DataCollatorForSeq2Seq)
-import evaluate
-from config import *
-from utils import preprocess_function
+# preprocess.py
 
-dataset = load_dataset(DATASET_NAME, DATASET_CONFIG)
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+import os
+from glob import glob
+from typing import List
 
-tokenized_datasets = dataset.map(
-    lambda x: preprocess_function(x, tokenizer, MAX_INPUT_LENGTH, MAX_TARGET_LENGTH),
-    batched=True,
-    remove_columns=dataset["train"].column_names,
-)
+import pretty_midi
+from tqdm import tqdm
 
-model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME)
+from config import CFG
+from utils import ensure_dir, midi_to_tokens, build_vocab, encode_tokens, save_json
 
-training_args = Seq2SeqTrainingArguments(
-    output_dir="./results",
-    evaluation_strategy="epoch",
-    learning_rate=LEARNING_RATE,
-    per_device_train_batch_size=BATCH_SIZE,
-    per_device_eval_batch_size=BATCH_SIZE,
-    num_train_epochs=NUM_EPOCHS,
-    save_total_limit=2,
-    predict_with_generate=True,
-    logging_dir='./logs',
-)
 
-rouge = evaluate.load("rouge")
-data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
+def list_midi_files(midi_dir: str) -> List[str]:
+    exts = ["*.mid", "*.midi"]
+    files = []
+    for e in exts:
+        files.extend(glob(os.path.join(midi_dir, e)))
+    return sorted(files)
 
-def compute_metrics(eval_preds):
-    preds, labels = eval_preds
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    return rouge.compute(predictions=decoded_preds, references=decoded_labels)
 
-trainer = Seq2SeqTrainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_datasets["train"],
-    eval_dataset=tokenized_datasets["validation"],
-    tokenizer=tokenizer,
-    data_collator=data_collator,
-    compute_metrics=compute_metrics,
-)
+def main():
+    ensure_dir(CFG.processed_dir)
 
-trainer.train()
+    midi_files = list_midi_files(CFG.midi_dir)
+    if len(midi_files) == 0:
+        print(f"[ERROR] No MIDI files found in: {CFG.midi_dir}")
+        print("Put some .mid/.midi files into data/midi/ and retry.")
+        return
 
-test_results = trainer.predict(tokenized_datasets["test"])
-print("ROUGE 결과:", compute_metrics(test_results))
+    all_tokens = []
+    kept_files = []
+
+    print(f"[INFO] Found {len(midi_files)} MIDI files. Tokenizing...")
+    for fp in tqdm(midi_files):
+        try:
+            pm = pretty_midi.PrettyMIDI(fp)
+            tokens = midi_to_tokens(pm, CFG.time_step, CFG.max_time_shift_steps)
+            if len(tokens) < 10:
+                continue
+            all_tokens.append(tokens)
+            kept_files.append(fp)
+        except Exception:
+            continue
+
+    if len(all_tokens) == 0:
+        print("[ERROR] Tokenization produced no usable sequences.")
+        return
+
+    vocab, id2tok = build_vocab(all_tokens)
+
+    encoded = [encode_tokens(toks, vocab) for toks in all_tokens]
+
+    # Save
+    save_json({"vocab": vocab, "id2tok": {str(k): v for k, v in id2tok.items()}},
+              os.path.join(CFG.processed_dir, "vocab.json"))
+    save_json({"files": kept_files}, os.path.join(CFG.processed_dir, "files.json"))
+    save_json({"sequences": encoded}, os.path.join(CFG.processed_dir, "sequences.json"))
+
+    print("[INFO] Done.")
+    print(f"  usable files : {len(kept_files)}")
+    print(f"  vocab size   : {len(vocab)}")
+    print(f"  saved to     : {CFG.processed_dir}")
+
+
+if __name__ == "__main__":
+    main()
+
 ```
 
 ###  설명
