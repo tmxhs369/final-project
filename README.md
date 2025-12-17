@@ -372,7 +372,20 @@ def main():
     if len(midi_files) == 0:
         print(f"[ERROR] No MIDI files found in: {CFG.midi_dir}")
         print("Put some .mid/.midi files i적
+```
+###  설명
+
+1. 역할
+- 원본 MIDI 데이터를 모델 학습에 적합한 시퀀스 데이터로 변환
+2. 처리 과정
+- data/midi/ 폴더 내 MIDI 파일 로드
+- MIDI 이벤트를 시간 순서대로 정렬
+- 이벤트 기반 토큰(NOTE_ON, NOTE_OFF, TIME_SHIFT) 생성
+- 토큰 시퀀스를 정수 ID 시퀀스로 변환
+- Vocabulary 및 시퀀스 데이터 저장
+3. 목적
 - 음악 데이터를 자연어 처리 문제와 유사한 시퀀스 예측 문제로 변환
+
 ---
 
 ##  4. `train.py`
@@ -540,6 +553,17 @@ if __name__ == "__main__":
     main()
 
 ```
+###  설명
+
+1. 역할
+- LSTM 기반 시퀀스 모델을 학습하는 메인 학습 스크립트
+2. 모델 구
+- Embedding Layer
+- Multi-layer LSTM
+- Fully Connected Layer
+3. 목적
+- 음악의 국소적 패턴과 시간적 흐름을 학습하여 새로운 음악 생성 가능하도록 모델 학습
+
 ---
 
 ##  5. `generate.py`
@@ -668,10 +692,16 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+###  설명
+
+1. 역할
+- 학습된 모델을 이용해 새로운 MIDI 음악을 생성
+2. 생성 옵션
+- Temperature: 생성 다양성 조절
+- Top-k Sampling: 확률 분포 상위 k개 토큰만 사용
+3. 출력
+- 생성된 음악에 대해 간단한 정량 평가 수행
 ---
-
-##  5. `generate.py`
-
 
 
 
